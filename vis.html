@@ -1,0 +1,204 @@
+
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
+</head>
+
+<body>
+  <p> </p>
+</body>
+
+
+<script type="text/javascript">
+var sc = {
+  "coords": [
+    [0.0454, 0.7797],
+    [0.087, 0.2173],
+    [0.1538, 0.102],
+    [0.4147, 0.8796],
+    [0.507, 0.8386],
+    [0.5584, 0.5784],
+    [0.6077, 0.9021],
+    [0.7513, 0.9992],
+    [0.8013, 0.1041],
+    [0.8115, 0.2878]
+  ],
+  "nodes": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
+  "edges": [
+    [1, 2],
+    [3, 4],
+    [3, 5],
+    [3, 6],
+    [4, 5],
+    [4, 6],
+    [4, 7],
+    [5, 6],
+    [6, 7],
+    [8, 9]
+  ],
+  "polygons": [
+    [
+      [3, 4, 5],
+      [3, 4, 6],
+      [3, 5, 6],
+      [4, 5, 6],
+      [4, 6, 7]
+    ],
+    [
+      [3, 4, 5, 6]
+    ]
+  ]
+}; 
+
+var w = 500, h = 500;
+var ctrx = w / 2, ctry = h / 2;
+var dm = 10;
+
+class Point {
+  constructor(x, y, dm) {
+    this.x = x;
+    this.y = y;
+    this.dm = dm;
+	}
+  display() {
+    circle(this.x, this.y, this.dm)
+  }
+}
+
+circle_set = [];
+
+class SimplicialComplex {
+	constructor(coords, nodes, edges, polygons){
+		this.coords = coords; 
+		this.nodes = nodes;
+		this.edges = edges; 
+		this.polygons = polygons;  
+    this.nc = [255, 0, 0];
+    this.lc = [255, 0, 0];
+		this.ec = [255, 0, 0];	
+		this.pc = [255, 0, 0];	
+	}
+
+	
+  node_color(_){
+		return arguments.length ? (this.nc = _) : this.nc;
+	}
+  label_color(_){
+		return arguments.length ? (this.lc = _) : this.lc;
+  }
+  edge_color(_){
+		return arguments.length ? (this.ec = _) : this.ec;
+  }
+  polygon_color(_){
+		return arguments.length ? (this.pc = _) : this.pc;
+	}
+
+
+	createNode(){
+		fill(this.node_color());
+    this.coords.forEach((xy) => {
+  	 	circle(xy[0] * w, xy[1] * h, 15)
+    });
+	}; 
+
+  // TODO(alex): 1. if diameter exceeds size of text, center text to node
+  // 2. center text to node
+  labelNode(){
+    fill(this.label_color());
+    this.coords.forEach((xy, i) => {
+      text(this.nodes[i], xy[0] * w, xy[1] * h)
+    })
+  }  
+
+	createEdge(){
+		this.edges.forEach((edge) => {
+			// fill(255, 0, 0, 1);
+			stroke(100, 0, 0);
+			strokeWeight(1);
+			let x0 = this.coords[edge[0]][0] * w;
+			let y0 = this.coords[edge[0]][1] * h;
+			let x1 = this.coords[edge[1]][0] * w;
+			let y1 = this.coords[edge[1]][1] * h;
+    	line(x0,y0,x1,y1);
+		});
+	}
+	createPolygons(){
+		fill('rgba(255,0,0, 0.25)');
+		this.polygons.forEach((simplices) => {
+			simplices.forEach((simplex) => {
+				// console.log(this.coords[simplex])
+				// console.log(simplex);
+				const d = simplex.length; 
+				
+				beginShape();
+				for (var i = 0; i < d; i++){
+					vertex(this.coords[simplex[i]][0] * w, this.coords[simplex[i]][1] * h);
+				}
+				endShape(CLOSE);
+			});
+		});
+	}
+}
+
+function point_converter(point_set, dm) {
+  obj_point_set = [];
+  for (i = 0; i < point_set.length; i++) {
+		obj_point_set.push(new Point( point_set[i][0] * w,  point_set[i][1] * h, dm));
+  }
+  return obj_point_set;
+}
+
+function display_all(obj_point_set){
+	for (i = 0; i < obj_point_set.length; i++) {
+    obj_point_set[i].display()
+  }
+}
+  
+let sc_instance = null; 
+function setup() {
+	frameRate(10);
+  createCanvas(w, h);
+  background(200, 200, 200);
+  
+  // sc["coords"].createNode()
+  sc_instance = new SimplicialComplex(sc["coords"], sc["nodes"], sc["edges"], sc["polygons"])
+  sc_instance.node_color([0,200,20])
+  sc_instance.label_color([0,0,0])
+  // sc_instance.label_color()
+	// new SimplicialComplex
+
+	// display_all(point_converter([[0.5, 0.5]], 50));
+	// display_all(point_converter(sc["coords"], 5));
+	
+	// line(0,0, width, height);
+  // let c = color(255, 204, 0);
+	// fill(c);
+	// circle(ctrx, ctry, dm);
+
+		
+	
+	// for(let i = 0;i < particles.length;i++) {	
+    // particles[i].createParticle();
+    // particles[i].moveParticle();
+    // particles[i].joinParticles(particles.slice(i));
+  // }
+  
+}
+function draw() {
+	background(0, 0, 200);
+	
+	// sc_instance.coords.forEach( (xy, i) =>{
+	// 	sc_instance.coords[i][0] = xy[0] > 1 ? 0 : xy[0] + 0.001; 
+	// });
+	sc_instance.createPolygons()
+	sc_instance.createEdge()
+	sc_instance.createNode()
+  sc_instance.labelNode()
+	// console.log(sc_instance.coords[1])
+}
+</script>
+
+</html>
