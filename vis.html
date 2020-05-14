@@ -4,7 +4,8 @@
 
 <head>
 	<meta charset="utf-8">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"></script>
 </head>
 
 <body>
@@ -13,47 +14,63 @@
 
 
 <script type="text/javascript">
-var sc = {
+var sc ={
   "coords": [
-    [0.0454, 0.7797],
-    [0.087, 0.2173],
-    [0.1538, 0.102],
-    [0.4147, 0.8796],
-    [0.507, 0.8386],
-    [0.5584, 0.5784],
-    [0.6077, 0.9021],
-    [0.7513, 0.9992],
-    [0.8013, 0.1041],
-    [0.8115, 0.2878]
+    [0.0063, 0.3159],
+    [0.0542, 0.8],
+    [0.0786, 0.7283],
+    [0.1124, 0.6664],
+    [0.1205, 0.4134],
+    [0.1882, 0.5259],
+    [0.2173, 0.2567],
+    [0.2196, 0.4976],
+    [0.3185, 0.0755],
+    [0.4225, 0.7029],
+    [0.4315, 0.8967],
+    [0.4683, 0.6201],
+    [0.7349, 0.3746],
+    [0.7778, 0.7963],
+    [0.791, 0.9439],
+    [0.8101, 0.9273],
+    [0.8138, 0.6701],
+    [0.8876, 0.2305],
+    [0.8887, 0.6742],
+    [0.996, 0.5002]
   ],
-  "nodes": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
+  "nodes": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s"],
   "edges": [
+    [0, 4],
     [1, 2],
-    [3, 4],
+    [1, 3],
+    [2, 3],
     [3, 5],
-    [3, 6],
+    [3, 7],
     [4, 5],
     [4, 6],
     [4, 7],
-    [5, 6],
-    [6, 7],
-    [8, 9]
+    [5, 7],
+    [9, 10],
+    [9, 11],
+    [13, 14],
+    [13, 15],
+    [13, 16],
+    [13, 18],
+    [14, 15],
+    [16, 18]
   ],
   "polygons": [
     [
-      [3, 4, 5],
-      [3, 4, 6],
-      [3, 5, 6],
-      [4, 5, 6],
-      [4, 6, 7]
+      [1, 2, 3],
+      [3, 5, 7],
+      [4, 5, 7],
+      [13, 14, 15],
+      [13, 16, 18]
     ],
-    [
-      [3, 4, 5, 6]
-    ]
+    []
   ]
-}; 
+}
 
-var w = 500, h = 500;
+var w = 800, h = 800;
 var ctrx = w / 2, ctry = h / 2;
 var dm = 10;
 
@@ -67,7 +84,6 @@ class Point {
     circle(this.x, this.y, this.dm)
   }
 }
-
 circle_set = [];
 
 class SimplicialComplex {
@@ -79,7 +95,11 @@ class SimplicialComplex {
     this.nc = [255, 0, 0];
     this.lc = [255, 0, 0];
 		this.ec = [255, 0, 0];	
-		this.pc = [255, 0, 0];	
+    this.pc = [255, 0, 0];
+    this.ndm = 10;
+    this.ts = 15;	
+    //_.meanBy()
+    //this.centroid = [/nodes.length, ctry];
 	}
 
 	
@@ -94,22 +114,35 @@ class SimplicialComplex {
   }
   polygon_color(_){
 		return arguments.length ? (this.pc = _) : this.pc;
-	}
+  }
+  node_diameter(_){
+    return arguments.length ? (this.ndm = _) : this.ndm;
+  }
+  text_size(_){
+    return arguments.length ? (this.ts = _) : this.ts;
+  }
 
 
 	createNode(){
 		fill(this.node_color());
     this.coords.forEach((xy) => {
-  	 	circle(xy[0] * w, xy[1] * h, 15)
+        circle(xy[0] * w, xy[1] * h, this.ndm)
     });
 	}; 
 
-  // TODO(alex): 1. if diameter exceeds size of text, center text to node
-  // 2. center text to node
+
   labelNode(){
     fill(this.label_color());
     this.coords.forEach((xy, i) => {
-      text(this.nodes[i], xy[0] * w, xy[1] * h)
+      textSize(this.text_size());
+      if (this.ndm > this.ts) {
+        textAlign(CENTER, CENTER);
+        text(this.nodes[i], xy[0] * w, xy[1] * h);
+      }
+      else {
+        textAlign(LEFT, BOTTOM);
+        text(this.nodes[i], xy[0] * w + (this.ts/2), xy[1] * h + (this.ts/2));
+      }
     })
   }  
 
@@ -117,7 +150,8 @@ class SimplicialComplex {
 		this.edges.forEach((edge) => {
 			// fill(255, 0, 0, 1);
 			stroke(100, 0, 0);
-			strokeWeight(1);
+      strokeWeight(1);
+      //  #6c757d
 			let x0 = this.coords[edge[0]][0] * w;
 			let y0 = this.coords[edge[0]][1] * h;
 			let x1 = this.coords[edge[1]][0] * w;
@@ -150,24 +184,28 @@ function point_converter(point_set, dm) {
   }
   return obj_point_set;
 }
-
 function display_all(obj_point_set){
 	for (i = 0; i < obj_point_set.length; i++) {
     obj_point_set[i].display()
   }
 }
+
   
 let sc_instance = null; 
 function setup() {
-	frameRate(10);
+	frameRate(30);
   createCanvas(w, h);
   background(200, 200, 200);
+
+  rectMode(RADIUS);
+  // translate(w/2, h/2);
+  //rotate(PI/3.0);
   
+
   // sc["coords"].createNode()
   sc_instance = new SimplicialComplex(sc["coords"], sc["nodes"], sc["edges"], sc["polygons"])
   sc_instance.node_color([0,200,20])
-  sc_instance.label_color([0,0,0])
-  // sc_instance.label_color()
+  sc_instance.label_color([20,20,20])
 	// new SimplicialComplex
 
 	// display_all(point_converter([[0.5, 0.5]], 50));
@@ -187,17 +225,45 @@ function setup() {
   // }
   
 }
+let i = 0; 
 function draw() {
-	background(0, 0, 200);
+  background(215, 215, 215);
 	
 	// sc_instance.coords.forEach( (xy, i) =>{
 	// 	sc_instance.coords[i][0] = xy[0] > 1 ? 0 : xy[0] + 0.001; 
-	// });
+  // });
+  
+  // push(); // Start a new drawing state
+  // strokeWeight(10);
+  // fill(204, 153, 0);
+  // translate(w/2 + w/4, h/2 + h/4);
+  // 
+  //push();
+  // rectMode(CENTER);
+  // translate(w / 2, h / 2);
+  // translate(p5.Vector.fromAngle(millis() / 1000, 40));
+  // scale(0.5 )
+  // push()
+  //translate(sc_instance.centroid[0], sc_instance.centroid[1]);
+  translate(ctrx, ctry);
+  rotate(radians(frameCount))
+  // rotate((PI / 64.0) * i, [0, 0]);
+  // rotate((PI / 64.0) * i, [ctrx, ctry]);
+  // pop()
+  //rotate((PI / 64.0) * i, [0, 0]);
+  i = i + 1; 
+  if (i == 128){ i = 0; }
+  
+  //rect(w/2, h/2, 33, 33); // Middle circle
+  //pop();
+  // pop(); // Restore original state
+
 	sc_instance.createPolygons()
 	sc_instance.createEdge()
 	sc_instance.createNode()
   sc_instance.labelNode()
-	// console.log(sc_instance.coords[1])
+
+  // console.log(sc_instance.coords[1])
 }
 </script>
 
