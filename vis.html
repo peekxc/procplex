@@ -106,7 +106,6 @@ class SimplicialComplex {
   node_color(_){
     return arguments.length ? (this.nc = _) : this.nc;
 	}
-
   label_color(_){
     return arguments.length ? (this.lc = _) : this.lc;
   }
@@ -122,16 +121,18 @@ class SimplicialComplex {
   text_size(_){
     return arguments.length ? (this.ts = _) : this.ts;
   }
+  
 
-  // TODO(alex): finish recycle()
   recycle(apply_from, sz){
     if (typeof apply_from === 'number') {apply_from = [apply_from];}
     if (!Array.isArray(apply_from)) {throw 'Argument is invalid';}
-    // if (apply_from.length < sz) // create new list of size sz with apply_from entries
-    apply_from.forEach((i) => {
-       apply_from[i] = apply_from[i%sz]; 
+    var new_list = apply_from.slice(0);
+    var list_dif = sz - new_list.length;
+    for (i = 0; i < list_dif; i++) {new_list.push(0);}
+    new_list.forEach((i) => {
+      new_list[i] = apply_from[i%sz];
     })
-    return apply_from
+    return new_list;
   }
 
 
