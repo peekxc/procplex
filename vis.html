@@ -104,16 +104,17 @@ class SimplicialComplex {
 
 	
   node_color(_){
-		return arguments.length ? (this.nc = _) : this.nc;
+    return arguments.length ? (this.nc = _) : this.nc;
 	}
+
   label_color(_){
-		return arguments.length ? (this.lc = _) : this.lc;
+    return arguments.length ? (this.lc = _) : this.lc;
   }
   edge_color(_){
-		return arguments.length ? (this.ec = _) : this.ec;
+    return arguments.length ? (this.ec = _) : this.ec;
   }
   polygon_color(_){
-		return arguments.length ? (this.pc = _) : this.pc;
+    return arguments.length ? (this.pc = _) : this.pc;
   }
   node_diameter(_){
     return arguments.length ? (this.ndm = _) : this.ndm;
@@ -122,11 +123,22 @@ class SimplicialComplex {
     return arguments.length ? (this.ts = _) : this.ts;
   }
 
+  // TODO(alex): finish recycle()
+  recycle(apply_from, sz){
+    if (typeof apply_from === 'number') {apply_from = [apply_from];}
+    if (!Array.isArray(apply_from)) {throw 'Argument is invalid';}
+    // if (apply_from.length < sz) // create new list of size sz with apply_from entries
+    apply_from.forEach((i) => {
+       apply_from[i] = apply_from[i%sz]; 
+    })
+    return apply_from
+  }
+
 
 	createNode(){
 		fill(this.node_color());
     this.coords.forEach((xy) => {
-        circle(xy[0] * w, xy[1] * h, this.ndm)
+        circle(xy[0] * w, xy[1] * h, this.ndm);
     });
 	}; 
 
@@ -190,6 +202,21 @@ function display_all(obj_point_set){
   }
 }
 
+function testing_arrays(test) {
+  if (typeof test === 'number') {
+    test = [test];
+  }
+  if (!Array.isArray(test)) {
+    throw 'Argument is invalid';
+  }
+  le = test.length;
+  var apply_to = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  le2 = apply_to.length;
+  for (i = 0; i < le2; i++) {
+    apply_to[i] += test[i%le];
+    console.log(str(apply_to[i]));
+  }
+}
   
 let sc_instance = null; 
 function setup() {
@@ -197,7 +224,7 @@ function setup() {
   createCanvas(w, h);
   background(200, 200, 200);
 
-  rectMode(RADIUS);
+  rectMode(CENTER);
   // translate(w/2, h/2);
   //rotate(PI/3.0);
   
@@ -208,6 +235,11 @@ function setup() {
   sc_instance.label_color([20,20,20])
 	// new SimplicialComplex
 
+  testing_arrays(2);
+  testing_arrays([1,2]);
+  testing_arrays([1,2,5]);
+  testing_arrays([1,2,1,10]);
+
 	// display_all(point_converter([[0.5, 0.5]], 50));
 	// display_all(point_converter(sc["coords"], 5));
 	
@@ -216,13 +248,14 @@ function setup() {
 	// fill(c);
 	// circle(ctrx, ctry, dm);
 
-		
 	
-	// for(let i = 0;i < particles.length;i++) {	
-    // particles[i].createParticle();
-    // particles[i].moveParticle();
-    // particles[i].joinParticles(particles.slice(i));
-  // }
+	/* 
+  for(let i = 0;i < particles.length;i++) {	
+    particles[i].createParticle();
+    particles[i].moveParticle();
+    particles[i].joinParticles(particles.slice(i));
+  }
+  */
   
 }
 let i = 0; 
