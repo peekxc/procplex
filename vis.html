@@ -98,10 +98,9 @@ class SimplicialComplex {
     this.pc = [255, 0, 0];
     this.ndm = 10;
     this.ts = 15;	
-    //_.meanBy()
-    //this.centroid = [/nodes.length, ctry];
-	}
-
+    this.centroid = [_.meanBy(coords, (xy) => {return xy[0] }), _.meanBy(coords, (xy) => {return xy[1] })];
+  }
+ 
 	
   node_color(_){
     return arguments.length ? (this.nc = _) : this.nc;
@@ -190,6 +189,22 @@ class SimplicialComplex {
 	}
 }
 
+  /*
+  // array -> first_elem
+  function first_elem(arr) {
+    return arr[0];
+  }
+  first_items = _.map([[4,2], [8,6]], first_elem); 
+  let first_items_sum = _.sum(first_items); 
+  let x = first_items_sum / first_items.length;
+  console.log("first_items_sum = " + first_items_sum)
+  console.log("mean = " + x);
+  // _.sum([[4, 2], [8, 6]]); 
+  */
+
+  // console.log("final mean " + _.meanBy([[4,2], [8,6]], function(arr) {return arr[0]} ));
+
+
 function point_converter(point_set, dm) {
   obj_point_set = [];
   for (i = 0; i < point_set.length; i++) {
@@ -229,13 +244,14 @@ function setup() {
   // translate(w/2, h/2);
   //rotate(PI/3.0);
   
-
+  
   // sc["coords"].createNode()
   sc_instance = new SimplicialComplex(sc["coords"], sc["nodes"], sc["edges"], sc["polygons"])
   sc_instance.node_color([0,200,20])
   sc_instance.label_color([20,20,20])
 	// new SimplicialComplex
 
+  // sc_instance.meanBy();
   testing_arrays(2);
   testing_arrays([1,2]);
   testing_arrays([1,2,5]);
